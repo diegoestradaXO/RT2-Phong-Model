@@ -1,4 +1,4 @@
-# RT1-Esferas
+# RT2-Phong Model
 
 ## Objetivos:
 
