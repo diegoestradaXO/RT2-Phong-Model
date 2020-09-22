@@ -6,24 +6,18 @@ from collections import namedtuple
 # Math
 
 class V3(object):
-  def __init__(self, x, y = None, z = None):
-    if (type(x) == numpy.matrix):
-      self.x, self.y, self.z = x.tolist()[0]
-    else:
-      self.x = x
-      self.y = y
-      self.z = z
+  def __init__(self, x, y, z):
+    self.x = x
+    self.y = y
+    self.z = z
 
   def __repr__(self):
     return "V3(%s, %s, %s)" % (self.x, self.y, self.z)
 
 class V2(object):
-  def __init__(self, x, y = None):
-    if (type(x) == numpy.matrix):
-      self.x, self.y = x.tolist()[0]
-    else:
-      self.x = x
-      self.y = y
+  def __init__(self, x, y):
+    self.x = x
+    self.y = y
 
   def __repr__(self):
     return "V2(%s, %s)" % (self.x, self.y)
@@ -66,15 +60,18 @@ def bbox(*vertices):
 
   return V2(int(xs[0]), int(ys[0])), V2(int(xs[-1]), int(ys[-1]))
 
+def reflect(I, N):
+  Lm = mul(I, -1)
+  n = mul(N, 2 * dot(Lm, N))
+  return norm(sub(Lm, n))
 
 def barycentric(A, B, C, P):
   bary = cross(
     V3(C.x - A.x, B.x - A.x, A.x - P.x),
     V3(C.y - A.y, B.y - A.y, A.y - P.y)
   )
-
   if abs(bary.z) < 1:
-    return -1, -1, -1  
+    return -1, -1, -1
 
   return (
     1 - (bary.x + bary.y) / bary.z,
@@ -85,46 +82,43 @@ def barycentric(A, B, C, P):
 # Utils
 
 def char(c):
-  """
-  Input: requires a size 1 string
-  Output: 1 byte of the ascii encoded char
-  """
   return struct.pack('=c', c.encode('ascii'))
 
 def word(w):
-  """
-  Input: requires a number such that (-0x7fff - 1) <= number <= 0x7fff
-         ie. (-32768, 32767)
-  Output: 2 bytes
-
-  Example:
-  >>> struct.pack('=h', 1)
-  b'\x01\x00'
-  """
   return struct.pack('=h', w)
 
 def dword(d):
-  """
-  Input: requires a number such that -2147483648 <= number <= 2147483647
-  Output: 4 bytes
-
-  Example:
-  >>> struct.pack('=l', 1)
-  b'\x01\x00\x00\x00'
-  """
   return struct.pack('=l', d)
 
-def color(r, g, b):
-  """
-  Input: each parameter must be a number such that 0 <= number <= 255
-         each number represents a color in rgb
-  Output: 3 bytes
+class color(object):
+  def __init__(self, r, g, b):
+    self.r = r
+    self.g = g
+    self.b = b
 
-  Example:
-  >>> bytes([0, 0, 255])
-  b'\x00\x00\xff'
-  """
-  return bytes([b, g, r])
+  def __add__(self, other_color):
+    r = self.r + other_color.r
+    g = self.g + other_color.g
+    b = self.b + other_color.b
+
+    return color(r, g, b)
+
+  def __mul__(self, other):
+    r = self.r * other
+    g = self.g * other
+    b = self.b * other
+    return color(r, g, b)
+
+  def __repr__(self):
+    return "color(%s, %s, %s)" % (self.r, self.g, self.b)
+
+  def toBytes(self):
+    self.r = int(max(min(self.r, 255), 0))
+    self.g = int(max(min(self.g, 255), 0))
+    self.b = int(max(min(self.b, 255), 0))
+    return bytes([self.b, self.g, self.r])
+
+  __rmul__ = __mul__
 
 
 def writebmp(filename, width, height, pixels):
@@ -153,5 +147,5 @@ def writebmp(filename, width, height, pixels):
   # Pixel data (width x height x 3 pixels)
   for x in range(height):
     for y in range(width):
-      f.write(pixels[x][y])
+      f.write(pixels[x][y].toBytes())
   f.close()

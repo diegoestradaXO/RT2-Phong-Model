@@ -1,15 +1,24 @@
 from lib import *
+from dataclasses import dataclass 
 
 WHITE = color(255, 255, 255)
 
 class Material(object):
-  def __init__(self, diffuse=WHITE):
+  def __init__(self, diffuse=WHITE,albedo=(1, 0), spec=0):
     self.diffuse = diffuse
+    self.albedo = albedo
+    self.spec = spec
 
+class Light(object):
+  def __init__(self, position=V3(0,0,0), intensity=1):
+    self.position = position
+    self.intensity = intensity
 
 class Intersect(object):
-  def __init__(self, distance):
+  def __init__(self, distance, point, normal):
     self.distance = distance
+    self.point = point
+    self.normal = normal
 
 class Sphere(object):
   def __init__(self, center, radius, material):
@@ -32,6 +41,11 @@ class Sphere(object):
     if t0 < 0:
       return None
 
+    hit = sum(orig, mul(direction, t0))
+    normal = norm(sub(hit, self.center))
+
     return Intersect(
-      distance=t0
+      distance=t0,
+      point=hit,
+      normal=normal
     )
