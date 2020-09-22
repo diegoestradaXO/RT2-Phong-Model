@@ -12,7 +12,7 @@ Para obtener la nota completa de ésta tarea deben entregar lo siguiente:
 
     Código fuente capaz de renderizar esferas con un Phong Reflection model
     Render de ejemplo que se vea como la imagen adjunta:
-![Imagen de referencia](./DSC_7802.jpg)
+[Imagen de referencia](./DSC_7802.jpg)
 <img src="DSC_7802.jpg" width="40%">.
 
 
