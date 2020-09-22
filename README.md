@@ -18,4 +18,4 @@ Para obtener la nota completa de ésta tarea deben entregar lo siguiente:
 La figura debe ser cargada en el centro de la pantalla y debe ser completamente visible
 
 ## Resultado:
-![bears](out.bmp)
+![bears](./out.bmp =100x20)
